@@ -1,0 +1,13 @@
+{application, rnis_data_fetcher,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  lager
+                 ]},
+  {mod, { rpd_routes_data_cache_app, []}},
+  {env, []}
+ ]}.
