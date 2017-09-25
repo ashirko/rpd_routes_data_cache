@@ -56,7 +56,9 @@ handle_cast(_Msg, State) ->
 handle_info(timeout, #state{routes = Routes} = State) ->
   RoutesId = lists:usort(lists:map(fun(#route_descr{id = Id}) ->
     Id end, Routes)),
+  lager:info("start load geoms"),
   rpd_geometry_data_cache:load_geoms(RoutesId),
+  lager:info("finish load geoms"),
   {Reg, NotReg} = send_data_to_atts(Routes),
   lager:info("num of reg atts: ~p", [length(Reg)]),
   lager:info("num of not reg atts: ~p", [length(NotReg)]),

@@ -68,6 +68,7 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
         load_geometry(GeomTableId,Trips)
     end
                 end, RouteIds),
+  lager:info("finished foreach"),
   {reply, ok, State, ?RELOAD_TIMEOUT}.
 handle_cast(_Msg, State) ->
   {noreply, State}.
