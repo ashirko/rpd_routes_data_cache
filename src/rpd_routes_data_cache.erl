@@ -58,8 +58,8 @@ handle_info(timeout, #state{routes = Routes} = State) ->
     Id end, Routes)),
   rpd_geometry_data_cache:load_geoms(RoutesId),
   {Reg, NotReg} = send_data_to_atts(Routes),
-  lager:info("num of reg atts: ~p", length(Reg)),
-  lager:info("num of not reg atts: ~p", length(NotReg)),
+  lager:info("num of reg atts: ~p", [length(Reg)]),
+  lager:info("num of not reg atts: ~p", [length(NotReg)]),
   {noreply, State};
 handle_info(reload, #state{timer_ref = Ref}=State) ->
   timer:cancel(Ref),
@@ -85,6 +85,7 @@ send_data_to_atts(Routes)->
     Id = Route#route_descr.att_id,
     case rnis_data_att_cache:is_register(Id) of
       true->
+        lager:info("Registred process: ~p", [Id]),
         rnis_data_att_fsm:send_route_data(Id, Route);
       false->
         {Acc, [{is_not_registred, Id} | ErrAcc]}
