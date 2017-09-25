@@ -65,14 +65,14 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
         lager:error("trips for route ~p were not found", [RouteId]);
       Trips->
         load_geometry(GeomTableId,Trips)
-    end,
-                end, TripsId),
+    end
+                end, RouteIds),
   {reply, ok, State, ?RELOAD_TIMEOUT}.
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(timeout, #state{table_geom=TableId}=State) ->
-  {noreply, State, ?RELOAD_TIMEOUT};
+%%handle_info(timeout, #state{table_geom=TableId}=State) ->
+%%  {noreply, State, ?RELOAD_TIMEOUT};
 handle_info(_Info, State) ->
   {noreply, State, ?RELOAD_TIMEOUT}.
 
