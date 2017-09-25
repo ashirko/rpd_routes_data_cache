@@ -10,7 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    rpd_routes_data_cache:start_link().
+    rpd_routes_data_cache_sup:start_link().
 
 stop(_State) ->
     ok.
