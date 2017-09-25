@@ -35,5 +35,5 @@ init([]) ->
         {rpd_geometry_data_cache, start_link, []},
         permanent, 5000, worker, [rpd_geometry_data_cache]},
     ToStart = [GeometryDataCache, RoutesDataCache],
-    {ok, {SupFlags, [ToStart]}}.
+    {ok, {SupFlags, ToStart}}.
 

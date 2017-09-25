@@ -27,14 +27,14 @@
 %%%===================================================================
 
 start_link() ->
-  lager:info("start_link rpd_geometry_data_cache"),
+  lager:info("start_link rpd_geometry_data_cache on node ~p", [node()]),
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
 
 get_geom(RouteId)->
-  gen_server:call(?SERVER, {get_geom, RouteId}).
+  gen_server:call({global,?SERVER}, {get_geom, RouteId}).
 
 load_geoms(Routes)->
-  gen_server:call(?SERVER, {load_geoms, Routes}).
+  gen_server:call({global, ?SERVER}, {load_geoms, Routes}).
 
 %%%===================================================================
 %%% gen_server callbacks
