@@ -31,10 +31,10 @@ start_link() ->
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
 
 get_geom(RouteId)->
-  gen_server:call({global,?SERVER}, {get_geom, RouteId}).
+  gen_server:call({global,?SERVER}, {get_geom, RouteId}, 10000).
 
 load_geoms(Routes)->
-  gen_server:call({global, ?SERVER}, {load_geoms, Routes}).
+  gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 1200 00).
 
 %%%===================================================================
 %%% gen_server callbacks
