@@ -16,7 +16,7 @@
 
 -include_lib("../../rnis_data/include/rnis_data.hrl").
 -define(SERVER, ?MODULE).
--define(INIT_TIMEOUT, 120000).
+-define(INIT_TIMEOUT, 60000).
 -define(WAIT_GEOM_TIMEOUT, ?INIT_TIMEOUT).
 
 -record(state, {routes, timer_ref}).
