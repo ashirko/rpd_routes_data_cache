@@ -59,6 +59,7 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
   ets:delete_all_objects(GeomTableId),
   ets:delete_all_objects(TripTableId),
   load_trips_id(TripTableId),
+  lager:info("RouteIds: ~p", [RouteIds]),
   lists:foreach(fun(RouteId)->
     case ets:lookup(TripTableId, RouteId) of
       []->
@@ -87,6 +88,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 load_trips_id(TripTableId)->
   Trips = rnis_data_trips_loader:load_data(),
+  lager:info("Trips: ~p", [Trips]),
   true = ets:insert(TripTableId, Trips).
 
 load_geometry(GeomTableId,Trips)->
