@@ -63,11 +63,11 @@ handle_info(timeout, #state{routes = Routes} = State) ->
   {noreply, State};
 handle_info(reload, #state{timer_ref = Ref}=State) ->
   timer:cancel(Ref),
-  Routes = load_routes(),
+  Routes = rnis_data_routes_loader:load_data(),
   ReloadTimeout = application:get_env(rpd_routes_data_cache,
     reload_routes_timeout, 86400000),
   {ok,NewRef} = timer:send_after(ReloadTimeout, reload),
-  {noreply, State#state{routes = Routes, timer_ref = NewRef}, ?WAIT_GEOM_TIMEOUT};
+  {noreply, State#state{routes = Routes, timer_ref = NewRef}, 0};
 handle_info(_Info, State) ->
   {noreply, State}.
 
