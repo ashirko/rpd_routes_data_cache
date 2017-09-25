@@ -83,7 +83,7 @@ send_data_to_atts(Routes)->
 
 load_routes()->
   Routes = rnis_data_routes_loader:load_data(),
-  RoutesId = lists:usort(lists:foreach(fun(#route_descr{id = Id}) ->
+  RoutesId = lists:usort(lists:map(fun(#route_descr{id = Id}) ->
     Id end, Routes)),
   rpd_geometry_data_cache:load_geoms(RoutesId),
   Routes.
