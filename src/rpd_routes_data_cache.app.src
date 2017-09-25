@@ -1,4 +1,4 @@
-{application, rnis_data_fetcher,
+{application, rpd_routes_data_cache,
  [
   {description, ""},
   {vsn, "1"},
