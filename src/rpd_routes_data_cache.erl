@@ -60,7 +60,7 @@ handle_info(timeout, #state{routes = Routes} = State) ->
   {Reg, NotReg} = send_data_to_atts(Routes),
   lager:info("num of reg atts: ~p", length(Reg)),
   lager:info("num of not reg atts: ~p", length(NotReg)),
-  {noreply, State#state{routes = Routes, }};
+  {noreply, State};
 handle_info(reload, #state{timer_ref = Ref}=State) ->
   timer:cancel(Ref),
   Routes = load_routes(),
