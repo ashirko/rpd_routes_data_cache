@@ -34,11 +34,18 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-  Routes = load_routes(),
+  Routes = rnis_data_routes_loader:load_data(),
   ReloadTimeout = application:get_env(rpd_routes_data_cache,
     reload_routes_timeout, 86400000),
   {ok,Ref} = timer:send_after(ReloadTimeout, reload),
-  {ok, #state{routes=Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
+  {ok, #state{routes = Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
+%%
+%%init([]) ->
+%%  Routes = load_routes(),
+%%  ReloadTimeout = application:get_env(rpd_routes_data_cache,
+%%    reload_routes_timeout, 86400000),
+%%  {ok,Ref} = timer:send_after(ReloadTimeout, reload),
+%%  {ok, #state{routes=Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
 
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
@@ -46,11 +53,14 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-handle_info(timeout, #state{routes=Routes}=State) ->
+handle_info(timeout, #state{routes = Routes} = State) ->
+  RoutesId = lists:usort(lists:map(fun(#route_descr{id = Id}) ->
+    Id end, Routes)),
+  rpd_geometry_data_cache:load_geoms(RoutesId),
   {Reg, NotReg} = send_data_to_atts(Routes),
   lager:info("num of reg atts: ~p", length(Reg)),
   lager:info("num of not reg atts: ~p", length(NotReg)),
-  {noreply, State};
+  {noreply, State#state{routes = Routes, }};
 handle_info(reload, #state{timer_ref = Ref}=State) ->
   timer:cancel(Ref),
   Routes = load_routes(),
@@ -80,10 +90,10 @@ send_data_to_atts(Routes)->
         {Acc, [{is_not_registred, Id} | ErrAcc]}
     end
               end, {[],[]}, Routes).
-
-load_routes()->
-  Routes = rnis_data_routes_loader:load_data(),
-  RoutesId = lists:usort(lists:map(fun(#route_descr{id = Id}) ->
-    Id end, Routes)),
-  rpd_geometry_data_cache:load_geoms(RoutesId),
-  Routes.
+%%
+%%load_routes()->
+%%  Routes = rnis_data_routes_loader:load_data(),
+%%  RoutesId = lists:usort(lists:map(fun(#route_descr{id = Id}) ->
+%%    Id end, Routes)),
+%%  rpd_geometry_data_cache:load_geoms(RoutesId),
+%%  Routes.
