@@ -20,6 +20,7 @@
 -define(RELOAD_TIMEOUT, 300000).
 -define(INIT_TIMEOUT, 120000).
 
+-compile(export_all).
 -record(state, {table_geom, table_trips}).
 
 %%%===================================================================
@@ -32,6 +33,9 @@ start_link() ->
 
 get_all()->
   gen_server:call({global,?SERVER}, get_all, 90000).
+
+get_all_trips()->
+  gen_server:call({global,?SERVER}, get_all_trips, 90000).
 
 get_geom(RouteId)->
   gen_server:call({global,?SERVER}, {get_geom, RouteId}, 90000).
@@ -51,12 +55,16 @@ init([]) ->
 handle_call(get_all, _From, #state{table_geom=TableId}=State) ->
   All = ets:tab2list(TableId),
   {reply, All, State};
+handle_call(get_all_trips, _From, #state{table_trips=TableId}=State) ->
+  All = ets:tab2list(TableId),
+  {reply, All, State};
 handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId, table_trips = TripsTable}=State) ->
   Result =
     case ets:lookup(TripsTable, RouteId) of
       []->
         {error, {route_not_found, RouteId}};
       Geom when is_list(Geom)->
+        lager:info("Geom: ~p", [Geom]),
         Res = lists:foldl(fun(E,Acc)->
           T = ets:lookup(TableId, E),
           T ++ Acc
