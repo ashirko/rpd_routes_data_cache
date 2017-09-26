@@ -62,10 +62,10 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
   lager:info("RouteIds: ~p", [RouteIds]),
   lists:foreach(fun(RouteId)->
     case ets:lookup(TripTableId, RouteId) of
-      []->
-        lager:error("trips for route ~p were not found", [RouteId]);
+      []->ok;
+%%        lager:error("trips for route ~p were not found", [RouteId]);
       Trips->
-        lager:info("Found trips for routeId ~p : Trips: ~p", [RouteId, Trips]),
+%%        lager:info("Found trips for routeId ~p : Trips: ~p", [RouteId, Trips]),
         load_geometry(GeomTableId,Trips)
     end
                 end, RouteIds),

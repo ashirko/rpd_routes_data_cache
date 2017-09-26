@@ -83,11 +83,13 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 
 send_data_to_atts(Routes)->
+  lager:info("Routes: ~p", [Routes]),
   lists:foldl(fun(Route, {Acc,ErrAcc})->
     Id = Route#route_descr.att_id,
     case rnis_data_att_cache:is_register(Id) of
       true->
         lager:info("Registred process: ~p", [Id]),
+        lager:info("Route: ~p", [Route]),
         rnis_data_att_fsm:send_route_data(Id, Route);
       false->
         {Acc, [{is_not_registred, Id} | ErrAcc]}
