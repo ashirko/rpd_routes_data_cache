@@ -37,6 +37,9 @@ get_all()->
 get_all_trips()->
   gen_server:call({global,?SERVER}, get_all_trips, 90000).
 
+get_trip(RouteId)->
+  gen_server:call({global,?SERVER}, {get_trip, RouteId}, 90000).
+
 get_geom(RouteId)->
   gen_server:call({global,?SERVER}, {get_geom, RouteId}, 90000).
 
@@ -52,6 +55,9 @@ init([]) ->
   TripsTableId = ets:new(trips, [bag]),
   {ok, #state{table_geom=GeomTableId, table_trips = TripsTableId}}.
 
+handle_call({get_trip,Trip}, _From, #state{table_trips=TableId}=State) ->
+  Res = ets:lookup(TableId, Trip),
+  {reply, Res, State};
 handle_call(get_all, _From, #state{table_geom=TableId}=State) ->
   All = ets:tab2list(TableId),
   {reply, All, State};
