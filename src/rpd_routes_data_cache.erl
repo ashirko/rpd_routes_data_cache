@@ -19,6 +19,8 @@
 -define(INIT_TIMEOUT, 60000).
 -define(WAIT_GEOM_TIMEOUT, ?INIT_TIMEOUT).
 
+-compile(export_all).
+
 -record(state, {routes, timer_ref}).
 
 %%%===================================================================
