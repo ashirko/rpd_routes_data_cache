@@ -4,7 +4,7 @@
 
 %% API
 -export([start_link/0]).
--export([load_geoms/1, get_geom/1]).
+-export([load_geoms/1, get_geom/1, get_all/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -30,8 +30,11 @@ start_link() ->
   lager:info("start_link rpd_geometry_data_cache on node ~p", [node()]),
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
 
-get_geom(RouteId)->
+get_all()->
   gen_server:call({global,?SERVER}, {get_geom, RouteId}, 10000).
+
+get_geom(RouteId)->
+  gen_server:call({global,?SERVER}, get_all, 90000).
 
 load_geoms(Routes)->
   gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 1000000).
@@ -45,6 +48,9 @@ init([]) ->
   TripsTableId = ets:new(trips, [bag]),
   {ok, #state{table_geom=GeomTableId, table_trips = TripsTableId}}.
 
+handle_call(get_all, _From, #state{table_geom=TableId}=State) ->
+  All = ets:tab2list(TableId),
+  {reply, All, State};
 handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId}=State) ->
   Result =
     case ets:lookup(TableId, RouteId) of
