@@ -34,7 +34,7 @@ get_geom(RouteId)->
   gen_server:call({global,?SERVER}, {get_geom, RouteId}, 10000).
 
 load_geoms(Routes)->
-  gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 600000).
+  gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 1000000).
 
 %%%===================================================================
 %%% gen_server callbacks
