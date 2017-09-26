@@ -49,7 +49,7 @@ handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId}=State) ->
   Result =
     case ets:lookup(TableId, RouteId) of
       []->
-        {error, route_not_found};
+        {error, {route_not_found, RouteId}};
       Geom when is_list(Geom)->
         {ok, Geom}
     end,
