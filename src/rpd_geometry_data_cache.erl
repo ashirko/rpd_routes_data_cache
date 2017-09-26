@@ -70,7 +70,7 @@ handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId, table_trips =
       []->
         {error, {route_not_found, RouteId}};
       Geom when is_list(Geom)->
-        lager:info("Geom: ~p", [Geom]),
+%%        lager:info("Geom: ~p", [Geom]),
         Res = lists:foldl(fun({_,E},Acc)->
           T = ets:lookup(TableId, E),
           T ++ Acc
