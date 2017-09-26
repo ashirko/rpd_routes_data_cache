@@ -34,7 +34,7 @@ get_geom(RouteId)->
   gen_server:call({global,?SERVER}, {get_geom, RouteId}, 10000).
 
 load_geoms(Routes)->
-  gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 300000).
+  gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 600000).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -65,6 +65,7 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
       []->
         lager:error("trips for route ~p were not found", [RouteId]);
       Trips->
+        lager:info("Found trips for routeId ~p : Trips: ~p", [RouteId, Trips]),
         load_geometry(GeomTableId,Trips)
     end
                 end, RouteIds),
@@ -96,6 +97,7 @@ load_geometry(GeomTableId,Trips)->
   lists:foreach(fun({_,TripId})->
     case rnis_data_route_geometry_loader:load_geometry_for_route(TripId) of
       {ok, Geom}->
+        lager:info("geometry data for ~p : ~p", [Trips, Geom]),
         true = ets:insert(GeomTableId, {TripId, Geom});
       {error, Reason}->
         lager:error("error while loading geometry data for ~p : ~p", [TripId, Reason])
