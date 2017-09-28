@@ -80,7 +80,7 @@ handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId, table_trips =
   {reply, Result, State};
 handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
     table_trips = TripTableId}=State) ->
-  ets:delete_all_objects(GeomTableId),
+%%  ets:delete_all_objects(GeomTableId),
   ets:delete_all_objects(TripTableId),
   load_trips_id(TripTableId),
   lager:info("RouteIds: ~p", [RouteIds]),
