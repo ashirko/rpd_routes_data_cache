@@ -59,11 +59,14 @@ handle_info(timeout, #state{routes = Routes} = State) ->
   lager:info("num of not reg atts: ~p", [length(NotReg)]),
   {noreply, State};
 handle_info(reload, #state{timer_ref = Ref}=State) ->
+  lager:info("reload 1"),
   timer:cancel(Ref),
   Routes = rnis_data_routes_loader:load_data(),
+  lager:info("reload 2"),
   ReloadTimeout = application:get_env(rpd_routes_data_cache,
     reload_routes_timeout, 3600000),
   {ok,NewRef} = timer:send_after(ReloadTimeout, reload),
+  lager:info("reload 3"),
   {noreply, State#state{routes = Routes, timer_ref = NewRef}, 0};
 handle_info(_Info, State) ->
   {noreply, State}.
