@@ -42,6 +42,16 @@ init([]) ->
   {ok,Ref} = timer:send_after(ReloadTimeout, reload),
   {ok, #state{routes = Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
 
+handle_call(reload,#state{timer_ref = Ref}=State,_)->
+  lager:info("reload 1"),
+  timer:cancel(Ref),
+  Routes = rnis_data_routes_loader:load_data(),
+  lager:info("reload 2"),
+  ReloadTimeout = application:get_env(rpd_routes_data_cache,
+    reload_routes_timeout, 3600000),
+  {ok,NewRef} = timer:send_after(ReloadTimeout, reload),
+  lager:info("reload 3"),
+  {reply, ok, State#state{routes = Routes, timer_ref = NewRef}, 0};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
