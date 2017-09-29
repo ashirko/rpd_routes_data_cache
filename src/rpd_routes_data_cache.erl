@@ -42,7 +42,7 @@ init([]) ->
   {ok,Ref} = timer:send_after(ReloadTimeout, reload),
   {ok, #state{routes = Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
 
-handle_call(reload,#state{timer_ref = Ref}=State,_)->
+handle_call(reload,_From,#state{timer_ref = Ref}=State)->
   lager:info("reload 1"),
   timer:cancel(Ref),
   Routes = rnis_data_routes_loader:load_data(),
