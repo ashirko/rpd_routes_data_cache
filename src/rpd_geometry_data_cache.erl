@@ -41,7 +41,7 @@ get_trip(RouteId)->
   gen_server:call({global,?SERVER}, {get_trip, RouteId}, 90000).
 
 get_geom(RouteId)->
-  gen_server:call({global,?SERVER}, {get_geom, RouteId}, 90000).
+  gen_server:call({global,?SERVER}, {get_geom, RouteId}, 300000).
 
 load_geoms(Routes)->
   gen_server:call({global, ?SERVER}, {load_geoms, Routes}, 1000000).
@@ -86,8 +86,9 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
   lager:info("RouteIds: ~p", [RouteIds]),
   lists:foreach(fun(RouteId)->
     case ets:lookup(TripTableId, RouteId) of
-      []->ok;
-%%        lager:error("trips for route ~p were not found", [RouteId]);
+      []->
+%%        ok;
+        lager:error("trips for route ~p were not found", [RouteId]);
       Trips->
 %%        lager:info("Found trips for routeId ~p : Trips: ~p", [RouteId, Trips]),
         load_geometry(GeomTableId,Trips)
