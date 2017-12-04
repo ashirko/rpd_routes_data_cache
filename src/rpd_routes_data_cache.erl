@@ -4,7 +4,7 @@
 
 %% API
 -export([start_link/0]).
--export([]).
+-export([reload/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -30,6 +30,9 @@
 start_link() ->
   lager:info("start_link rpd_routes_data_cache on node ~p", [node()]),
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
+
+reload()->
+  gen_server:call({global,?SERVER}, reload, 3600000).
 
 %%%===================================================================
 %%% gen_server callbacks
