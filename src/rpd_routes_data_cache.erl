@@ -102,6 +102,7 @@ send_data_to_atts(Routes)->
         lager:info("Registred process: ~p", [Id]),
         lager:info("Route: ~p", [Route]),
         rnis_data_att_fsm:send_route_data(Id, Route),
+        timer:sleep(15),
         {[Id|Acc], ErrAcc};
       false->
         {Acc, [{is_not_registred, Id} | ErrAcc]}
