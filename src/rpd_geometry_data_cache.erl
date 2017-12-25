@@ -120,12 +120,14 @@ load_trips_id(TripTableId)->
 
 load_geometry(GeomTableId,Trips)->
   lists:foreach(fun({_,TripId})->
-    case rnis_data_route_geometry_loader:load_geometry_for_route(TripId) of
+    case catch rnis_data_route_geometry_loader:load_geometry_for_route(TripId) of
       {ok, Geom}->
 %%        lager:info("geometry data for ~p : ~p", [Trips, Geom]),
         true = ets:insert(GeomTableId, {TripId, Geom});
       {error, Reason}->
-        lager:error("error while loading geometry data for ~p : ~p", [TripId, Reason])
+        lager:error("error while loading geometry data for ~p : ~p", [TripId, Reason]);
+      Error->
+        lager:error("catch error while loading geometry data for ~p : ~p", [TripId, Error])
     end
                 end, Trips).
 
