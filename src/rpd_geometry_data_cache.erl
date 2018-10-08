@@ -28,14 +28,13 @@
 %%%===================================================================
 
 start_link() ->
-  lager:info("start_link rpd_geometry_data_cache on node ~p", [node()]),
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
 
 get_all()->
   gen_server:call({global,?SERVER}, get_all, 90000).
 
 get_all_trips()->
-  gen_server:call({global,?SERVER}, get_all_trips, 90000).
+    gen_server:call({global,?SERVER}, get_all_trips, 90000).
 
 get_trip(RouteId)->
   gen_server:call({global,?SERVER}, {get_trip, RouteId}, 90000).
@@ -70,7 +69,6 @@ handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId, table_trips =
       []->
         {error, {route_not_found, RouteId}};
       Geom when is_list(Geom)->
-%%        lager:info("Geom: ~p", [Geom]),
         Res = lists:foldl(fun({_,E},Acc)->
           T = ets:lookup(TableId, E),
           T ++ Acc
@@ -83,14 +81,12 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
 %%  ets:delete_all_objects(GeomTableId),
   ets:delete_all_objects(TripTableId),
   load_trips_id(TripTableId),
-  lager:info("RouteIds: ~p", [RouteIds]),
+  lager:info("number of route ids: ~p", [length(RouteIds)]),
   lists:foreach(fun(RouteId)->
     case ets:lookup(TripTableId, RouteId) of
       []->
-%%        ok;
         lager:error("trips for route ~p were not found", [RouteId]);
       Trips->
-%%        lager:info("Found trips for routeId ~p : Trips: ~p", [RouteId, Trips]),
         load_geometry(GeomTableId,Trips)
     end
                 end, RouteIds),
@@ -99,8 +95,6 @@ handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
 handle_cast(_Msg, State) ->
   {noreply, State}.
 
-%%handle_info(timeout, #state{table_geom=TableId}=State) ->
-%%  {noreply, State, ?RELOAD_TIMEOUT};
 handle_info(_Info, State) ->
   {noreply, State, ?RELOAD_TIMEOUT}.
 
@@ -115,14 +109,13 @@ code_change(_OldVsn, State, _Extra) ->
 
 load_trips_id(TripTableId)->
   Trips = rnis_data_trips_loader:load_data(),
-  lager:info("Trips: ~p", [Trips]),
+  lager:info("number of trips: ~p", [length(Trips)]),
   true = ets:insert(TripTableId, Trips).
 
 load_geometry(GeomTableId,Trips)->
   lists:foreach(fun({_,TripId})->
     case catch rnis_data_route_geometry_loader:load_geometry_for_route(TripId) of
       {ok, Geom}->
-%%        lager:info("geometry data for ~p : ~p", [Trips, Geom]),
         true = ets:insert(GeomTableId, {TripId, Geom});
       {error, Reason}->
         lager:error("error while loading geometry data for ~p : ~p", [TripId, Reason]);
