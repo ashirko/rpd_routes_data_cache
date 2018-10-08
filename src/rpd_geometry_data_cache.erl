@@ -4,7 +4,7 @@
 
 %% API
 -export([start_link/0]).
--export([load_geoms/1, get_geom/1, get_all/0]).
+-export([load_geoms/1, get_geom/1, get_all/0, get_all_trips/0, get_trip/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -19,8 +19,6 @@
 -define(SERVER, ?MODULE).
 -define(RELOAD_TIMEOUT, 300000).
 -define(INIT_TIMEOUT, 120000).
-
--compile(export_all).
 -record(state, {table_geom, table_trips}).
 
 %%%===================================================================
@@ -78,7 +76,7 @@ handle_call({get_geom, RouteId}, _From, #state{table_geom=TableId, table_trips =
   {reply, Result, State};
 handle_call({load_geoms, RouteIds}, _From, #state{table_geom=GeomTableId,
     table_trips = TripTableId}=State) ->
-%%  ets:delete_all_objects(GeomTableId),
+  ets:delete_all_objects(GeomTableId),
   ets:delete_all_objects(TripTableId),
   load_trips_id(TripTableId),
   lager:info("number of route ids: ~p", [length(RouteIds)]),

@@ -4,7 +4,6 @@
 
 %% API
 -export([start_link/0]).
--export([reload/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -17,11 +16,8 @@
 -include_lib("../../rnis_data/include/rnis_data.hrl").
 -define(SERVER, ?MODULE).
 -define(INIT_TIMEOUT, 60000).
--define(RELOAD_TIMEOUT, 3600000)
+-define(RELOAD_TIMEOUT, 14400000).
 -define(WAIT_GEOM_TIMEOUT, ?INIT_TIMEOUT).
-
--compile(export_all).
-
 -record(state, {routes, timer_ref}).
 
 %%%===================================================================
@@ -30,9 +26,6 @@
 
 start_link() ->
   gen_server:start_link({global, ?SERVER}, ?MODULE, [], []).
-
-reload()->
-  gen_server:call({global,?SERVER}, reload, ?RELOAD_TIMEOUT).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -45,13 +38,6 @@ init([]) ->
   {ok,Ref} = timer:send_after(ReloadTimeout, reload),
   {ok, #state{routes = Routes, timer_ref = Ref}, ?INIT_TIMEOUT}.
 
-handle_call(reload,_From,#state{timer_ref = Ref}=State)->
-  timer:cancel(Ref),
-  Routes = rnis_data_routes_loader:load_data(),
-  ReloadTimeout = application:get_env(rpd_routes_data_cache,
-    reload_routes_timeout, ?RELOAD_TIMEOUT),
-  {ok,NewRef} = timer:send_after(ReloadTimeout, reload),
-  {reply, ok, State#state{routes = Routes, timer_ref = NewRef}, 0};
 handle_call(_Request, _From, State) ->
   {reply, ok, State}.
 
